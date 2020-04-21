@@ -6,7 +6,13 @@
 
 require('./bootstrap');
 
-window.Vue = require('vue');
+import Vue from 'vue';
+import VueRouter from 'vue-router';
+
+import router from './router'
+
+window.Vue = Vue
+Vue.use(VueRouter);
 
 /**
  * The following block of code may be used to automatically register your
@@ -19,7 +25,9 @@ window.Vue = require('vue');
 // const files = require.context('./', true, /\.vue$/i)
 // files.keys().map(key => Vue.component(key.split('/').pop().split('.')[0], files(key).default))
 
-Vue.component('example-component', require('./components/ExampleComponent.vue').default);
+// Vue.component('example-component', require('./components/ExampleComponent.vue').default);
+
+// Vue.component('', require('./components/ExampleComponent.vue').default);
 
 /**
  * Next, we will create a fresh Vue application instance and attach it to
@@ -27,6 +35,18 @@ Vue.component('example-component', require('./components/ExampleComponent.vue').
  * or customize the JavaScript scaffolding to fit your unique needs.
  */
 
+// router.beforeEach((to, from, next) => {
+  // console.log('to: ' + to);
+  // console.log('from: ' + from);
+  // console.log('next: ' + next);
+  // if (to.matched.some(record => record.meta.requiresAuth) && !Auth.loggedIn) {
+  //   next({ path: '/login', query: { redirect: to.fullPath }});
+  // } else {
+  //   next();
+  // }
+// });
+
 const app = new Vue({
     el: '#app',
+    router
 });

@@ -8,8 +8,9 @@
     <title>test</title>
   </head>
   <body>
-    index.blade.phpに記述
-    <div id="app"></div>
-    <script src="{{ mix('js/app.js') }}" defer></script>
+    <div id="app">
+        <router-view/>
+    </div>
+    <script src="{{ mix('js/app.js') }}"></script>
   </body>
 </html>
