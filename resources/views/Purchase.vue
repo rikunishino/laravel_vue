@@ -7,11 +7,7 @@
         <div class="subjectList">
           科目:
           <select v-model="subject">
-            <option>国語</option>
-            <option>算数</option>
-            <option>英語</option>
-            <option>理科</option>
-            <option>社会</option>
+            <option v-for="(item, index) in subjectList" :key="index">{{ item }}</option>
           </select>
         </div>
         <table class="productList">
@@ -114,6 +110,9 @@ export default {
       // ドラッグしているかどうか
       isDrag:false,
 
+      // 科目リスト
+      subjectList: [],
+
       // 表示中の科目
       subject: selectedSubject,
 
@@ -130,8 +129,21 @@ export default {
     // 商品の要素取得
     productElement = this.$refs.product
     purchasePageElement = this.$refs.purchasePage
+
+    this.getData()
   },
   methods: {
+    /**
+     * DBからデータを取得
+     */
+    getData: function() {
+      axios.get('/subject')
+      .then(response => {
+        for(var i = 0; i < response.data.length; i++) {
+          this.$set(this.subjectList, i, response.data[i].name)
+        }
+      });
+    },
     /**
      * クラス追加
      */
@@ -226,8 +238,7 @@ export default {
      */
     mouseOver: function() {
       var productRow = event.currentTarget
-      var productData = productRow.childNodes
-      productRow.style.border = "solid 2px #25afff"
+      var productData = productRow.children
       for(var i = 0; i < productData.length; i++) {
         productData[i].style.border = "solid 2px #25afff"
       }
@@ -237,8 +248,7 @@ export default {
      */
     mouseLeave: function() {
       var productRow = event.currentTarget
-      var productData = productRow.childNodes
-      productRow.style.border = "solid 2px #b9b9b9"
+      var productData = productRow.children
       for(var i = 0; i < productData.length; i++) {
         productData[i].style.border = "solid 2px #b9b9b9"
       }
