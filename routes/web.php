@@ -11,29 +11,25 @@
 |
 */
 
-Route::get('/login', function () {
-    return view('index');
-});
-
-// Route::get('/{any}', function () {
+// Route::get('/{any}', function() {
 //     return view('index');
 // })->where('any', '.*');
-
-// Route::get('/sample', function() {
-//     return view('sample');
-// });
 
 // Auth::routes();
 
 // Route::get('/home', 'HomeController@index')->name('home');
 
-// Route::get('users',function(){
-// 	return App\User::all();
-// });
+Route::get('/login',function(){
+	return view('index');
+});
 
-// Route::get('subject',function(){
-// 	return App\Subject::all();
-// });
+Route::get('/subject',function(){
+	return App\Models\Subject::all();
+});
+
+Route::get('/product', function(){
+	return App\Models\Product::all();
+});
 
 Route::get('/corporation', function(){
 	return App\Models\Corporation::all();

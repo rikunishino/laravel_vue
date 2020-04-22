@@ -6,8 +6,8 @@
         <h2>商品一覧</h2>
         <div class="subjectList">
           科目:
-          <select v-model="subject">
-            <option v-for="(item, index) in subjectList" :key="index">{{ item }}</option>
+          <select @change="selectSubject()">
+            <option v-for="(item, index) in subjectList" :key="index">{{ item.name }}</option>
           </select>
         </div>
         <table class="productList">
@@ -18,11 +18,11 @@
             </tr>
           </thead>
           <tbody v-for="product in products" :key="product.id">
-            <tr v-if="product.subject==subject"
+            <tr v-if="product.subject_id==subject_id"
               @mousedown="dragStart(product, $event)"
               @mouseover="mouseOver"
               @mouseleave="mouseLeave">
-              <td ref="product">{{ product.name }}</td>
+              <td ref="product">{{ product.product_name }}</td>
               <td>{{ product.price }}</td>
             </tr>
           </tbody>
@@ -59,7 +59,7 @@ import Cart from '../js/components/purchase/Cart.vue'
 // 確認画面
 import Confirm from '../js/components/purchase/Confirm.vue'
 // 選択中の科目
-var selectedSubject = '国語';
+// var selectedSubjectId = 0;
 
 // 商品の要素
 var productElement = null
@@ -88,22 +88,24 @@ export default {
       // クラスリスト
       classList: [],
       // 商品一覧
-      products: [
-        {id: '0', sort_num: 0, subject: '国語', name: '国語の教科書', price: 2400, amount: 0},
-        {id: '1', sort_num: 1, subject: '国語', name: '国語のドリル', price: 1500, amount: 0},
-        {id: '2', sort_num: 2, subject: '国語', name: '国語のノート', price: 700, amount: 0},
-        {id: '3', sort_num: 0, subject: '算数', name: '算数の教科書', price: 2600, amount: 0},
-        {id: '4', sort_num: 1, subject: '算数', name: '算数のドリル', price: 1800, amount: 0},
-        {id: '5', sort_num: 2, subject: '算数', name: '算数のドリル2', price: 1600, amount: 0},
-        {id: '6', sort_num: 3, subject: '算数', name: '算数のノート', price: 600, amount: 0},
-        {id: '7', sort_num: 0, subject: '英語', name: '英語の教科書', price: 1200, amount: 0},
-        {id: '8', sort_num: 1, subject: '英語', name: '英語のドリル', price: 1100, amount: 0},
-        {id: '9', sort_num: 2, subject: '英語', name: '英語のノート', price: 700, amount: 0},
-        {id: '10', sort_num: 0, subject: '理科', name: '理科の教科書', price: 3000, amount: 0},
-        {id: '11', sort_num: 1, subject: '理科', name: '理科のノート', price: 900, amount: 0},
-        {id: '12', sort_num: 0, subject: '社会', name: '社会の教科書', price: 2800, amount: 0},
-        {id: '13', sort_num: 1, subject: '社会', name: '社会のノート', price: 800, amount: 0}
-      ],
+      products: [],
+      // products: [
+      //   {id: '0', sort_no: 0, subject: '国語', name: '国語の教科書', price: 2400, amount: 0},
+      //   {id: '1', sort_no: 1, subject: '国語', name: '国語のドリル', price: 1500, amount: 0},
+      //   {id: '2', sort_no: 2, subject: '国語', name: '国語のノート', price: 700, amount: 0},
+      //   {id: '3', sort_no: 0, subject: '算数', name: '算数の教科書', price: 2600, amount: 0},
+      //   {id: '4', sort_no: 1, subject: '算数', name: '算数のドリル', price: 1800, amount: 0},
+      //   {id: '5', sort_no: 2, subject: '算数', name: '算数のドリル2', price: 1600, amount: 0},
+      //   {id: '6', sort_no: 3, subject: '算数', name: '算数のノート', price: 600, amount: 0},
+      //   {id: '7', sort_no: 0, subject: '英語', name: '英語の教科書', price: 1200, amount: 0},
+      //   {id: '8', sort_no: 1, subject: '英語', name: '英語のドリル', price: 1100, amount: 0},
+      //   {id: '9', sort_no: 2, subject: '英語', name: '英語のノート', price: 700, amount: 0},
+      //   {id: '10', sort_no: 0, subject: '理科', name: '理科の教科書', price: 3000, amount: 0},
+      //   {id: '11', sort_no: 1, subject: '理科', name: '理科のノート', price: 900, amount: 0},
+      //   {id: '12', sort_no: 0, subject: '社会', name: '社会の教科書', price: 2800, amount: 0},
+      //   {id: '13', sort_no: 1, subject: '社会', name: '社会のノート', price: 800, amount: 0}
+      // ],
+
       // 商品
       product: null,
 
@@ -114,7 +116,7 @@ export default {
       subjectList: [],
 
       // 表示中の科目
-      subject: selectedSubject,
+      subject_id: null,
 
       // カート内商品
       putProducts: [],
@@ -137,12 +139,35 @@ export default {
      * DBからデータを取得
      */
     getData: function() {
+      // 科目データの取得
       axios.get('/subject')
       .then(response => {
         for(var i = 0; i < response.data.length; i++) {
-          this.$set(this.subjectList, i, response.data[i].name)
+          if(i === 0) {
+            this.subject_id = response.data[i].id
+          }
+          this.$set(this.subjectList, i, response.data[i])
         }
       });
+
+      // 商品データの取得
+      axios.get('/product')
+      .then(response => {
+        for(var i = 0; i < response.data.length; i++) {
+          this.$set(this.products, i, response.data[i])
+        }
+      });
+      // console.log(this.products)
+    },
+    /**
+     * 科目変更
+     */
+    selectSubject: function() {
+      for(var i = 0; i < this.subjectList.length; i++) {
+        if(event.target.value === this.subjectList[i].name) {
+          this.subject_id = this.subjectList[i].id
+        }
+      }
     },
     /**
      * クラス追加
@@ -174,7 +199,7 @@ export default {
       this.product = targetProduct
 
       // アニメーション用のクローン作成
-      productClone = productElement[this.product.sort_num].cloneNode(true)
+      productClone = productElement[this.product.sort_no].cloneNode(true)
       productClone.style.position = 'absolute'
       productClone.style.top = event.pageY + 10 + 'px'
       productClone.style.left = event.pageX + 10 + 'px'
