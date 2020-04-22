@@ -1,7 +1,7 @@
 <template>
   <div ref="purchasePage" class="purchasePage" @mousemove="dragging" @mouseup="reset">
     <!-- 商品一覧 -->
-    <div class="productAndCart" v-if="!isConfirmActive">
+    <div class="productAndCart">
       <div class="product">
         <h2>商品一覧</h2>
         <div class="subjectList">
@@ -44,10 +44,9 @@
         <div class="total">
           合計: {{ total }}(税込: {{ totalIncludedTax }})円
         </div>
-        <button class="toConfirmButton" @click="toConfirm()" v-if="!isConfirmActive">確認画面に進む</button>
+        <button class="toConfirmButton" @click="toConfirm()">確認画面に進む</button>
       </div>
     </div>
-    <Confirm :total="total" :totalIncludedTax="totalIncludedTax" v-if="isConfirmActive" />
   </div>
 </template>
 
@@ -57,7 +56,7 @@ import AddCart from '../js/components/purchase/AddCart.vue'
 // カート
 import Cart from '../js/components/purchase/Cart.vue'
 // 確認画面
-import Confirm from '../js/components/purchase/Confirm.vue'
+// import Confirm from '../js/components/purchase/Confirm.vue'
 // 選択中の科目
 // var selectedSubjectId = 0;
 
@@ -78,13 +77,10 @@ const MIN_AMOUNT = 1
 export default {
   components: {
     AddCart,
-    Cart,
-    Confirm
+    Cart
   },
   data() {
     return {
-      // 確認画面を表示するか
-      isConfirmActive: false,
       // クラスリスト
       classList: [],
       // 商品一覧
@@ -239,7 +235,9 @@ export default {
      * 確認画面への遷移
      */
     toConfirm: function() {
-      this.isConfirmActive = true
+      this.$store.commit('setTotal', this.total)
+      this.$store.commit('setTotalIncludedTax', this.totalIncludedTax)
+      this.$router.push('confirm')
     },
     /**
      * テーブル要素にカーソルが重なった際
