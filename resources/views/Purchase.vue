@@ -18,7 +18,7 @@
             </tr>
           </thead>
           <tbody v-for="product in products" :key="product.id">
-            <tr v-if="product.subject_id==subject_id"
+            <tr v-show="product.subject_id==subject_id"
               @mousedown="dragStart(product, $event)"
               @mouseover="mouseOver"
               @mouseleave="mouseLeave">
@@ -89,22 +89,6 @@ export default {
       classList: [],
       // 商品一覧
       products: [],
-      // products: [
-      //   {id: '0', sort_no: 0, subject: '国語', name: '国語の教科書', price: 2400, amount: 0},
-      //   {id: '1', sort_no: 1, subject: '国語', name: '国語のドリル', price: 1500, amount: 0},
-      //   {id: '2', sort_no: 2, subject: '国語', name: '国語のノート', price: 700, amount: 0},
-      //   {id: '3', sort_no: 0, subject: '算数', name: '算数の教科書', price: 2600, amount: 0},
-      //   {id: '4', sort_no: 1, subject: '算数', name: '算数のドリル', price: 1800, amount: 0},
-      //   {id: '5', sort_no: 2, subject: '算数', name: '算数のドリル2', price: 1600, amount: 0},
-      //   {id: '6', sort_no: 3, subject: '算数', name: '算数のノート', price: 600, amount: 0},
-      //   {id: '7', sort_no: 0, subject: '英語', name: '英語の教科書', price: 1200, amount: 0},
-      //   {id: '8', sort_no: 1, subject: '英語', name: '英語のドリル', price: 1100, amount: 0},
-      //   {id: '9', sort_no: 2, subject: '英語', name: '英語のノート', price: 700, amount: 0},
-      //   {id: '10', sort_no: 0, subject: '理科', name: '理科の教科書', price: 3000, amount: 0},
-      //   {id: '11', sort_no: 1, subject: '理科', name: '理科のノート', price: 900, amount: 0},
-      //   {id: '12', sort_no: 0, subject: '社会', name: '社会の教科書', price: 2800, amount: 0},
-      //   {id: '13', sort_no: 1, subject: '社会', name: '社会のノート', price: 800, amount: 0}
-      // ],
 
       // 商品
       product: null,
@@ -124,15 +108,12 @@ export default {
       // 合計金額
       total: 0,
       // 税込
-      totalIncludedTax: 0
+      totalIncludedTax: 0,
     }
   },
   mounted: function() {
-    // 商品の要素取得
-    productElement = this.$refs.product
-    purchasePageElement = this.$refs.purchasePage
-
     this.getData()
+    purchasePageElement = this.$refs.purchasePage
   },
   methods: {
     /**
@@ -157,7 +138,6 @@ export default {
           this.$set(this.products, i, response.data[i])
         }
       });
-      // console.log(this.products)
     },
     /**
      * 科目変更
@@ -189,6 +169,9 @@ export default {
      * ドラッグ開始
      */
     dragStart: function(targetProduct) {
+      // 商品の要素取得
+      productElement = this.$refs.product
+
       if(productClone != null) {
         productClone.remove()
       }

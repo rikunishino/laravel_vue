@@ -15,7 +15,7 @@
       </thead>
       <tbody v-for="(putProduct, index) in putProducts" :key="index">
         <tr>
-          <td class="putProductName">{{ putProduct.name }}</td>
+          <td class="putProductName">{{ putProduct.product_name }}</td>
           <td class="putProductPrice">{{ putProduct.price }}</td>
           <td class="putProductAmount">
             <input type="text" :value="putProduct.amount"
@@ -87,22 +87,20 @@ export default {
         if(this.putProducts[index].amount < MAX_AMOUNT) {
             this.$set(this.putProducts, index, {
                                                 id: this.putProducts[index].id,
-                                                subject: this.putProducts[index].subject,
-                                                name: this.putProducts[index].name,
+                                                className: this.putProducts[index].className,
+                                                product_name: this.putProducts[index].product_name,
                                                 price: this.putProducts[index].price,
-                                                amount: parseInt(this.putProducts[index].amount) + 1,
-                                                className: this.putProducts[index].className
+                                                amount: parseInt(this.putProducts[index].amount) + 1
                                               })
           }
       } else {
         // カートに商品を追加
         this.$set(this.putProducts, this.putProducts.length, {
                                                               id: this.product.id,
-                                                              subject: this.product.subject,
-                                                              name: this.product.name,
+                                                              className: this.className,
+                                                              product_name: this.product.product_name,
                                                               price: this.product.price,
-                                                              amount:this.product.amount + 1,
-                                                              className: this.selectedClass
+                                                              amount: 1
                                                             })
       }
       // this.putProductsLength = this.putProducts.length
@@ -114,7 +112,7 @@ export default {
      */
     checkDuplication: function(id) {
       for(var i = 0; i < this.putProducts.length; i++) {
-        if((id === this.putProducts[i].id) && (this.selectedClass === this.putProducts[i].className)) {
+        if((id === this.putProducts[i].id) && (this.className === this.putProducts[i].className)) {
           return i
         }
       }
@@ -125,11 +123,10 @@ export default {
       if(amount === '') {
         this.$set(this.putProducts, index, {
                                             id: this.putProducts[index].id,
-                                            subject: this.putProducts[index].subject,
-                                            name: this.putProducts[index].name,
+                                            className: this.putProducts[index].className,
+                                            product_name: this.putProducts[index].product_name,
                                             price: this.putProducts[index].price,
-                                            amount: '',
-                                            className: this.putProducts[index].className
+                                            amount: ''
                                           })
         return
       }
@@ -143,20 +140,18 @@ export default {
       if(amount.match('^[1-9][0-9]*$') != null) {
         this.$set(this.putProducts, index, {
                                             id: this.putProducts[index].id,
-                                            subject: this.putProducts[index].subject,
-                                            name: this.putProducts[index].name,
+                                            className: this.putProducts[index].className,
+                                            product_name: this.putProducts[index].product_name,
                                             price: this.putProducts[index].price,
-                                            amount: parseInt(amount),
-                                            className: this.putProducts[index].className
+                                            amount: parseInt(amount)
                                           })
       } else {
         this.$set(this.putProducts, index, {
                                             id: this.putProducts[index].id,
-                                            subject: this.putProducts[index].subject,
-                                            name: this.putProducts[index].name,
+                                            className: this.putProducts[index].className,
+                                            product_name: this.putProducts[index].product_name,
                                             price: this.putProducts[index].price,
-                                            amount: 1,
-                                            className: this.putProducts[index].className
+                                            amount: 1
                                           })
       }
       // 合計金額の計算
@@ -169,11 +164,10 @@ export default {
       if(amount === '') {
         this.$set(this.putProducts, index, {
                                             id: this.putProducts[index].id,
-                                            subject: this.putProducts[index].subject,
-                                            name: this.putProducts[index].name,
+                                            className: this.putProducts[index].className,
+                                            product_name: this.putProducts[index].product_name,
                                             price: this.putProducts[index].price,
-                                            amount: 1,
-                                            className: this.putProducts[index].className
+                                            amount: 1
                                           })
       }
       // 合計金額の計算
@@ -188,11 +182,10 @@ export default {
           if(this.putProducts[index].amount < MAX_AMOUNT) {
             this.$set(this.putProducts, index, {
                                                 id: this.putProducts[index].id,
-                                                subject: this.putProducts[index].subject,
-                                                name: this.putProducts[index].name,
+                                                className: this.putProducts[index].className,
+                                                product_name: this.putProducts[index].product_name,
                                                 price: this.putProducts[index].price,
-                                                amount: parseInt(this.putProducts[index].amount) + 1,
-                                                className: this.putProducts[index].className
+                                                amount: parseInt(this.putProducts[index].amount) + 1
                                               })
           }
           break
@@ -200,11 +193,10 @@ export default {
           if(this.putProducts[index].amount > MIN_AMOUNT) {
             this.$set(this.putProducts, index, {
                                               id: this.putProducts[index].id,
-                                              subject: this.putProducts[index].subject,
-                                              name: this.putProducts[index].name,
+                                              className: this.putProducts[index].className,
+                                              product_name: this.putProducts[index].product_name,
                                               price: this.putProducts[index].price,
-                                              amount: parseInt(this.putProducts[index].amount) - 1,
-                                              className: this.putProducts[index].className
+                                              amount: parseInt(this.putProducts[index].amount) - 1
                                             })
           }
           break
