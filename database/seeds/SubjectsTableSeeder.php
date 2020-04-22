@@ -12,7 +12,7 @@ class SubjectsTableSeeder extends Seeder
     public function run()
     {
         // 全件削除
-        DB::table('subjects')->truncate();
+        // DB::table('subjects')->truncate();
 
         DB::table('subjects')->insert([
             ['name' => '国語'],
