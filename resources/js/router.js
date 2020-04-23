@@ -13,5 +13,15 @@ export default new Router({
       name: 'purchase',
       component: () => import('../views/Purchase.vue')
     },
+    {
+      path: '/confirm',
+      name: 'confirm',
+      component: () => import('../views/Confirm.vue')
+    },
+    {
+      path: '/complete',
+      name: 'complete',
+      component: () => import('../views/Complete.vue')
+    },
   ]
 })
