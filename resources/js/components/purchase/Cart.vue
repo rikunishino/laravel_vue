@@ -2,7 +2,7 @@
   <div>
     <button class="putProductDeleteThisCart" @click="putProductDeleteThisCart()">このカートをクリア</button>
     <button class="deleteThisCart" @click="deleteThisCart()">このカートを削除</button>
-    小計: {{ total }}円
+    小計: {{ totalWithComma }}円
     <button class="showHideSwitchingButton" @click="showHideSwitching">{{ showOrHideMessage }}</button>
     <table class="putProductList" v-if="isContentsShow" @mouseup="dragEnd">
       <thead>
@@ -46,13 +46,15 @@ const HIDE_MESSAGE = 'カート内を非表示にする ▲'
 
 export default {
   name: 'Cart',
-  props: ['isDrag', 'product', 'className'],
+  props: ['isDrag', 'product', 'className', 'putProductsList', 'cartIndex'],
   data:function() {
     return {
       // カート内の商品
       putProducts: [],
       // 合計金額
       total: 0,
+      // 合計金額（3桁区切り）
+      totalWithComma: '0',
       // カート内の表示、非表示の切り替えメッセージ（デフォルト: 非表示）
       showOrHideMessage: HIDE_MESSAGE,
       // カートの中身を表示中かどうか
@@ -106,6 +108,7 @@ export default {
       // this.putProductsLength = this.putProducts.length
       //合計金額算出
       this.totalPrice()
+      this.sendCartInfo()
     },
     /**
      * カート内の商品と重複をチェック
@@ -156,6 +159,7 @@ export default {
       }
       // 合計金額の計算
       this.totalPrice()
+      this.sendCartInfo()
     },
     /**
      * 空文字を「1」に置き換える
@@ -172,6 +176,7 @@ export default {
       }
       // 合計金額の計算
       this.totalPrice()
+      this.sendCartInfo()
     },
     /**
      * 購入数変更
@@ -203,6 +208,7 @@ export default {
       }
       //合計金額算出
       this.totalPrice()
+      this.sendCartInfo()
     },
     /**
      * カート内商品削除（1商品ずつ）
@@ -211,6 +217,7 @@ export default {
       this.putProducts.splice(index, 1)
       //合計金額算出
       this.totalPrice()
+      this.sendCartInfo()
     },
     /**
      * カート内商品削除（このカート内全て）
@@ -219,6 +226,7 @@ export default {
       this.putProducts.splice(0)
       //合計金額算出
       this.totalPrice()
+      this.sendCartInfo()
     },
     /**
      * カートの削除
@@ -227,6 +235,7 @@ export default {
       this.$emit('deleteThisCart', this.className)
       //合計金額算出
       this.totalPrice()
+      this.sendCartInfo()
     },
     /**
      * 合計金額の計算（クラス別）
@@ -236,7 +245,20 @@ export default {
       for(var i = 0; i < this.putProducts.length; i++) {
         this.total += this.putProducts[i].price * this.putProducts[i].amount
       }
-      this.$emit('totalPrice', {className: this.className, totalPrice: this.total})
+      // 3桁毎にカンマで区切る
+      this.totalWithComma = this.addComma(this.total)
+
+      this.$emit('totalPrice',
+        {
+          className: this.className,
+          totalPrice: this.total,
+        })
+    },
+    /**
+     * カート内情報を親コンポーネントに集計
+     */
+    sendCartInfo: function() {
+      this.$emit('createPutProductsList', this.putProducts)
     }
   }
 }

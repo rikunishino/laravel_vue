@@ -1,5 +1,6 @@
 <template>
   <div ref="purchasePage" class="purchasePage" @mousemove="dragging" @mouseup="reset">
+    ID: {{ corporationId }} 法人名: {{ corporationName }}
     <!-- 商品一覧 -->
     <div class="productAndCart">
       <div class="product">
@@ -18,7 +19,7 @@
             </tr>
           </thead>
           <tbody v-for="product in products" :key="product.id">
-            <tr v-show="product.subject_id==subject_id"
+            <tr v-if="product.subject_id==subject_id"
               @mousedown="dragStart(product, $event)"
               @mouseover="mouseOver"
               @mouseleave="mouseLeave">
@@ -38,11 +39,13 @@
           <div v-for="(targetClass, index) in classList" :key="index">
             カートNo.{{ index + 1 }} クラス名: {{ targetClass.name }}
             <Cart :isDrag="isDrag" :product="product" :className="targetClass.name"
-              v-on:totalPrice='totalPrice' v-on:deleteThisCart='deleteClass'/>
+              :putProductsList="putProductsList" :cartIndex="index"
+              v-on:totalPrice='totalPrice' v-on:deleteThisCart='deleteClass'
+              v-on:createPutProductsList='createPutProductsList'/>
           </div>
         </div>
         <div class="total">
-          合計: {{ total }}(税込: {{ totalIncludedTax }})円
+          合計: {{ totalWithComma }}(税込: {{ totalIncludedTaxWithComma }})円
         </div>
         <button class="toConfirmButton" @click="toConfirm()">確認画面に進む</button>
       </div>
@@ -69,7 +72,7 @@ var productClone = null
 var purchasePageElement = null
 
 // 税率
-const TAX_RATE = 0.1
+const TAX_RATE = 10
 // 最大および最小購入数
 const MAX_AMOUNT = 99
 const MIN_AMOUNT = 1
@@ -99,17 +102,29 @@ export default {
       subject_id: null,
 
       // カート内商品
-      putProducts: [],
+      putProductsList: [],
 
       // 合計金額
       total: 0,
+      // 合計金額（3桁区切り）
+      totalWithComma: '0',
       // 税込
       totalIncludedTax: 0,
+      // 合計金額（3桁区切り）
+      totalIncludedTaxWithComma: '0',
     }
   },
   mounted: function() {
     this.getData()
     purchasePageElement = this.$refs.purchasePage
+  },
+  computed: {
+    corporationId() {
+      return this.$store.state.auth.corporationId
+    },
+    corporationName() {
+      return this.$store.state.auth.corporationName
+    }
   },
   methods: {
     /**
@@ -221,7 +236,11 @@ export default {
         }
         this.total += this.classList[i].totalPrice
       }
-      this.totalIncludedTax = this.total + (this.total * TAX_RATE)
+      this.totalIncludedTax = this.total + (this.total * TAX_RATE/100)
+
+      // 3桁毎にカンマで区切る
+      this.totalWithComma = this.addComma(this.total)
+      this.totalIncludedTaxWithComma = this.addComma(this.totalIncludedTax)
     },
     /**
      * カート削除（全て）
@@ -232,11 +251,27 @@ export default {
       this.totalPrice()
     },
     /**
+     * 全カート内容の集計
+     */
+    createPutProductsList(putProducts) {
+      for(var i = 0; i < this.putProductsList.length; i++) {
+        // console.log(putProducts[0].className + ':' + this.putProductsList[i][0].className);
+        if(putProducts[0].className === this.putProductsList[i][0].className) {
+          this.$set(this.putProductsList, i, putProducts)
+          this.$store.commit('setPutProductsList', this.putProductsList)
+          return
+        }
+      }
+      this.$set(this.putProductsList, this.putProductsList.length, putProducts)
+      this.$store.commit('setPutProductsList', this.putProductsList)
+    },
+    /**
      * 確認画面への遷移
      */
     toConfirm: function() {
       this.$store.commit('setTotal', this.total)
       this.$store.commit('setTotalIncludedTax', this.totalIncludedTax)
+      this.$store.commit('setClassList', this.classList)
       this.$router.push('confirm')
     },
     /**
