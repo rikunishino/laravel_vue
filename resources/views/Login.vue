@@ -36,8 +36,10 @@ export default {
   methods: {
     login: function() {
       for(var i = 0; i < this.corporations.length; i++) {
+        // IDおよびバスワードが一致したらログイン成功
         if(this.login_id === this.corporations[i].login_id
           && this.password === this.corporations[i].password) {
+          // 法人情報を保持
           this.$store.commit('setLoginCorporation', [
             {
               corporationId: this.corporations[i].id,
@@ -49,11 +51,17 @@ export default {
               fax: this.corporations[i].fax,
             }
           ])
-          this.$router.push('purchase')
+          // ログインした法人に紐づく学校情報を取得
+          axios.get('/api/schools/' + this.corporations[i].id)
+            .then(response => {
+              // 学校情報を保持
+              this.$store.commit('setSchoolsList', response.data)
+
+              // 購入画面に遷移
+              this.$router.push('purchase')
+            });
         }
       }
-      // this.$store.commit('setLoginCorporation', [{corporationId: 100, corporationName: 'aaa'}])
-      // this.$router.push('purchase')
     }
   }
 }

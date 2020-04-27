@@ -17,6 +17,10 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
 
+// 注文
 Route::apiResource('/orders', 'OrderApiController');
 Route::apiResource('/orderCarts', 'OrderCartApiController');
 Route::apiResource('/orderItems', 'OrderItemApiController');
+
+// 学校
+Route::apiResource('/schools', 'SchoolApiController');

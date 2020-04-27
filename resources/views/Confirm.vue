@@ -2,7 +2,11 @@
   <div>
     <h2>購入確認</h2>
     <div>
-            合計: {{ total }}(税込: {{ totalIncludedTax }})円
+      注文内容
+
+    </div>
+    <div>
+      合計: {{ total }}(税込: {{ totalIncludedTax }})円
     </div>
     <button @click="purchaseConfirmation()">確定</button>
   </div>
@@ -11,6 +15,14 @@
 <script>
 export default {
   name: 'Confirm',
+  data: function() {
+    return {
+      putProductsList: []
+    }
+  },
+  mounted: function() {
+    this.putProductsList = this.$store.state.order.putProductsList
+  },
   computed: {
     total() {
       return this.$store.state.order.total
@@ -44,36 +56,37 @@ export default {
 
       // orders_itemsテーブル
       var orderItemData = new FormData()
-      var putProductsList = this.$store.state.order.putProductsList
-      for(var i = 0; i < putProductsList.length; i++) {
-        orderItemData.append('putProductsListLength' + i, putProductsList[i].length)
-        for(var j = 0; j < putProductsList[i].length; j++) {
+      for(var i = 0; i < this.putProductsList.length; i++) {
+        orderItemData.append('putProductsListLength' + i, this.putProductsList[i].length)
+        for(var j = 0; j < this.putProductsList[i].length; j++) {
           // orderItemData.append('cartName' + i + ':' + j, putProductsList[i][j].className)
-          orderItemData.append('productId' + i + ':' + j, putProductsList[i][j].id)
-          orderItemData.append('amount'  + i + ':' + j, putProductsList[i][j].amount)
+          orderItemData.append('productId' + i + ':' + j, this.putProductsList[i][j].id)
+          orderItemData.append('amount'  + i + ':' + j, this.putProductsList[i][j].amount)
           // console.log(putProductsList[i][j].id)
         }
       }
-      orderItemData.append('putProductsListLength', putProductsList.length)
-      console.log(putProductsList)
-      // console.log(putProductsList[0][1].id)
+      orderItemData.append('putProductsListLength', this.putProductsList.length)
+      // console.log(this.$store.state.auth.schoolsList)
+
+
+
       // リクエスト送信
-      axios
-        .post('/api/orders/', orderData)
-        .then(response => {
-          // console.log(response.data.order_id)
-          orderCartData.append('order_id', response.data.order_id)
-          orderItemData.append('order_id', response.data.order_id)
-          axios
-            .post('/api/orderCarts/', orderCartData)
-            .then(response => {
-            })
-          axios
-            .post('/api/orderItems/', orderItemData)
-            .then(response => {
-              console.log(response.data.message)
-            })
-        })
+      // axios
+      //   .post('/api/orders/', orderData)
+      //   .then(response => {
+      //     // console.log(response.data.order_id)
+      //     orderCartData.append('order_id', response.data.order_id)
+      //     orderItemData.append('order_id', response.data.order_id)
+      //     axios
+      //       .post('/api/orderCarts/', orderCartData)
+      //       .then(response => {
+      //       })
+      //     axios
+      //       .post('/api/orderItems/', orderItemData)
+      //       .then(response => {
+      //         console.log(response.data.message)
+      //       })
+      //   })
     }
   }
 }
