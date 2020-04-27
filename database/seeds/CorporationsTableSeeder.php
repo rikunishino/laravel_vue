@@ -21,6 +21,16 @@ class CorporationsTableSeeder extends Seeder
                 'postal_code'=>'000-0000',
                 'tel'=>'111-1111',
                 'fax'=>'111-2222'
+            ],
+            [
+                'login_id'=>'example',
+                'password'=>'password',
+                'name'=>'Example',
+                'mail'=>'example@example.co.jp',
+                'address'=>'bb県dd市kk町',
+                'postal_code'=>'999-9999',
+                'tel'=>'888-9999',
+                'fax'=>'888-8888'
             ]
         ]);
     }
