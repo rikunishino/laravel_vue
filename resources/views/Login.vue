@@ -27,11 +27,10 @@ export default {
     }
   },
   mounted() {
-    console.log('response')
+    // console.log('response')
     axios.get('/corporation')
       .then(response => {
         this.corporations = response.data
-        // console.log(response.data[0].password)
       });
   },
   methods: {
@@ -39,10 +38,22 @@ export default {
       for(var i = 0; i < this.corporations.length; i++) {
         if(this.login_id === this.corporations[i].login_id
           && this.password === this.corporations[i].password) {
-          // console.log('pass')
+          this.$store.commit('setLoginCorporation', [
+            {
+              corporationId: this.corporations[i].id,
+              corporationName: this.corporations[i].name,
+              mail: this.corporations[i].mail,
+              address: this.corporations[i].address,
+              postal_code: this.corporations[i].postal_code,
+              tel: this.corporations[i].tel,
+              fax: this.corporations[i].fax,
+            }
+          ])
           this.$router.push('purchase')
         }
       }
+      // this.$store.commit('setLoginCorporation', [{corporationId: 100, corporationName: 'aaa'}])
+      // this.$router.push('purchase')
     }
   }
 }
