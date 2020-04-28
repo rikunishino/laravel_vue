@@ -19,7 +19,7 @@
             </tr>
           </thead>
           <tbody v-for="product in products" :key="product.id">
-            <tr v-if="product.subject_id==subject_id"
+            <tr v-if="product.subject_id==subjectId"
               @mousedown="dragStart(product, $event)"
               @mouseover="mouseOver"
               @mouseleave="mouseLeave">
@@ -32,20 +32,11 @@
       <!-- カート -->
       <div class="cartArea">
         <h2>カート</h2>
-        <AddCart v-on:addClass="addClass" :classList="classList"/>
-        <button class="putProductDeleteAll" @click="deleteProductAll()">全カート削除</button>
-        <div class="carts">
-          クラス別カート 一覧
-          <div v-for="(targetClass, index) in classList" :key="index">
-            カートNo.{{ index + 1 }} クラス名: {{ targetClass.name }}
-            <Cart :isDrag="isDrag" :product="product" :className="targetClass.name"
-              :putProductsList="putProductsList" :cartIndex="index"
-              v-on:totalPrice='totalPrice' v-on:deleteThisCart='deleteClass'
-              v-on:createPutProductsList='createPutProductsList'/>
-          </div>
-        </div>
-        <div class="total">
-          合計: {{ totalWithComma }}(税込: {{ totalIncludedTaxWithComma }})円
+        <ChangeSchool :schoolsList="schoolsList" :schoolId="schoolId" v-on:selectSchool="selectSchool"/>
+        schoolId{{schoolId}}
+        <div v-for="(item, index) in schoolsList" :key="index">
+          <School v-show="schoolId==item.id" :isDrag="isDrag" :product="product" :schoolId="schoolId"/>
+          <!-- <School :isDrag="isDrag" :product="product" :schoolId="schoolId"/> -->
         </div>
         <button class="toConfirmButton" @click="toConfirm()">確認画面に進む</button>
       </div>
@@ -54,14 +45,10 @@
 </template>
 
 <script>
-// クラスごとのカート選択用
-import AddCart from '../js/components/purchase/AddCart.vue'
-// カート
-import Cart from '../js/components/purchase/Cart.vue'
-// 確認画面
-// import Confirm from '../js/components/purchase/Confirm.vue'
-// 選択中の科目
-// var selectedSubjectId = 0;
+// 対象の学校選択用
+import ChangeSchool from '../js/components/purchase/ChangeSchool.vue'
+// 学校
+import School from '../js/components/purchase/School.vue'
 
 // 商品の要素
 var productElement = null
@@ -79,13 +66,17 @@ const MIN_AMOUNT = 1
 
 export default {
   components: {
-    AddCart,
-    Cart
+    ChangeSchool,
+    School,
+    // AddCart,
+    // Cart
   },
   data() {
     return {
+      // 学校リスト
+      schoolsList: [],
       // クラスリスト
-      classList: [],
+      //classList: [],
       // 商品一覧
       products: [],
 
@@ -98,20 +89,11 @@ export default {
       // 科目リスト
       subjectList: [],
 
-      // 表示中の科目
-      subject_id: null,
+      // 表示中の科目ID
+      subjectId: null,
 
-      // カート内商品
-      putProductsList: [],
-
-      // 合計金額
-      total: 0,
-      // 合計金額（3桁区切り）
-      totalWithComma: '0',
-      // 税込
-      totalIncludedTax: 0,
-      // 合計金額（3桁区切り）
-      totalIncludedTaxWithComma: '0',
+      // 選択中の学校ID
+      schoolId: null
     }
   },
   mounted: function() {
@@ -135,8 +117,9 @@ export default {
       axios.get('/subject')
       .then(response => {
         for(var i = 0; i < response.data.length; i++) {
+          // デフォルト値の設定
           if(i === 0) {
-            this.subject_id = response.data[i].id
+            this.subjectId = response.data[i].id
           }
           this.$set(this.subjectList, i, response.data[i])
         }
@@ -149,6 +132,15 @@ export default {
           this.$set(this.products, i, response.data[i])
         }
       });
+
+      // 学校リストの取得（DBからはログイン時に取得済）
+      for(var i = 0; i < this.$store.state.auth.schoolsList.length; i++) {
+        // デフォルト値の設定
+        if(i === 0) {
+          this.schoolId = this.$store.state.auth.schoolsList[i].id
+        }
+        this.$set(this.schoolsList, i, this.$store.state.auth.schoolsList[i])
+      }
     },
     /**
      * 科目変更
@@ -156,25 +148,15 @@ export default {
     selectSubject: function() {
       for(var i = 0; i < this.subjectList.length; i++) {
         if(event.target.value === this.subjectList[i].name) {
-          this.subject_id = this.subjectList[i].id
+          this.subjectId = this.subjectList[i].id
         }
       }
     },
     /**
-     * クラス追加
+     * 学校変更
      */
-    addClass: function(className) {
-      this.$set(this.classList, this.classList.length, {
-                                                        name: className,
-                                                        totalPrice: 0
-                                                      })
-    },
-    deleteClass: function(className) {
-      for(var i = 0; i < this.classList.length; i++) {
-        if(this.classList[i].name === className) {
-          this.classList.splice(i, 1)
-        }
-      }
+    selectSchool: function(id) {
+      this.schoolId = id
     },
     /**
      * ドラッグ開始
@@ -224,46 +206,6 @@ export default {
       if(productClone != null) {
         productClone.remove()
       }
-    },
-    /**
-     * 合計金額の計算
-     */
-    totalPrice: function(classList) {
-      this.total = 0
-      for(var i = 0; i < this.classList.length; i++) {
-        if(this.classList[i].name === classList.className) {
-          this.classList[i].totalPrice = classList.totalPrice
-        }
-        this.total += this.classList[i].totalPrice
-      }
-      this.totalIncludedTax = this.total + (this.total * TAX_RATE/100)
-
-      // 3桁毎にカンマで区切る
-      this.totalWithComma = this.addComma(this.total)
-      this.totalIncludedTaxWithComma = this.addComma(this.totalIncludedTax)
-    },
-    /**
-     * カート削除（全て）
-     */
-    deleteProductAll: function() {
-      this.classList = []
-      //合計金額算出
-      this.totalPrice()
-    },
-    /**
-     * 全カート内容の集計
-     */
-    createPutProductsList(putProducts) {
-      for(var i = 0; i < this.putProductsList.length; i++) {
-        // console.log(putProducts[0].className + ':' + this.putProductsList[i][0].className);
-        if(putProducts[0].className === this.putProductsList[i][0].className) {
-          this.$set(this.putProductsList, i, putProducts)
-          this.$store.commit('setPutProductsList', this.putProductsList)
-          return
-        }
-      }
-      this.$set(this.putProductsList, this.putProductsList.length, putProducts)
-      this.$store.commit('setPutProductsList', this.putProductsList)
     },
     /**
      * 確認画面への遷移
