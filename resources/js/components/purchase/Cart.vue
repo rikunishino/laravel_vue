@@ -247,7 +247,6 @@ export default {
       }
       // 3桁毎にカンマで区切る
       this.totalWithComma = this.addComma(this.total)
-
       this.$emit('totalPrice',
         {
           className: this.className,

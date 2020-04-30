@@ -17,8 +17,19 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
 
+// 科目
+Route::apiResource('/subjects', 'SubjectApiController');
+
+// 商品
+Route::apiResource('/products', 'ProductApiController');
+
+// 法人
+Route::apiResource('/corporations', 'CorporationApiController');
+
+
 // 注文
 Route::apiResource('/orders', 'OrderApiController');
+Route::apiResource('/orderSchools', 'OrderSchoolApiController');
 Route::apiResource('/orderCarts', 'OrderCartApiController');
 Route::apiResource('/orderItems', 'OrderItemApiController');
 
