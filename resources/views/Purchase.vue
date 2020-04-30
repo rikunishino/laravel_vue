@@ -35,9 +35,10 @@
         <ChangeSchool :schoolsList="schoolsList" :schoolId="schoolId" v-on:selectSchool="selectSchool"/>
         schoolId{{schoolId}}
         <div v-for="(item, index) in schoolsList" :key="index">
-          <School v-show="schoolId==item.id" :isDrag="isDrag" :product="product" :schoolId="schoolId"/>
-          <!-- <School :isDrag="isDrag" :product="product" :schoolId="schoolId"/> -->
+          <School v-show="schoolId==item.id" :isDrag="isDrag" :product="product" :schoolId="schoolId"
+            v-on:totalPrice="totalPrice"/>
         </div>
+        合計: {{ totalWithComma }}(税込: {{ totalIncludedTaxWithComma }})円
         <button class="toConfirmButton" @click="toConfirm()">確認画面に進む</button>
       </div>
     </div>
@@ -93,7 +94,16 @@ export default {
       subjectId: null,
 
       // 選択中の学校ID
-      schoolId: null
+      schoolId: null,
+
+      // 合計金額
+      total: 0,
+      // 合計金額（3桁区切り）
+      totalWithComma: '0',
+      // 税込
+      totalIncludedTax: 0,
+      // 合計金額（3桁区切り）
+      totalIncludedTaxWithComma: '0',
     }
   },
   mounted: function() {
@@ -157,6 +167,7 @@ export default {
      */
     selectSchool: function(id) {
       this.schoolId = id
+      // console.log(this.total)
     },
     /**
      * ドラッグ開始
@@ -235,7 +246,27 @@ export default {
       for(var i = 0; i < productData.length; i++) {
         productData[i].style.border = "solid 2px #b9b9b9"
       }
-    }
+    },
+    /**
+     * 合計金額（全学校分）の計算
+     */
+    totalPrice: function(schoolsList) {
+      this.total = 0
+
+      for(var i = 0; i < this.schoolsList.length; i++) {
+        if(this.schoolsList[i].id === schoolsList.schoolId) {
+          this.schoolsList[i].totalPrice = schoolsList.totalPrice
+        }
+        if(this.schoolsList[i].totalPrice != undefined) {
+          this.total += this.schoolsList[i].totalPrice
+        }
+      }
+      this.totalIncludedTax = this.total + (this.total * TAX_RATE/100)
+
+      // 3桁毎にカンマで区切る
+      this.totalWithComma = this.addComma(this.total)
+      this.totalIncludedTaxWithComma = this.addComma(this.totalIncludedTax)
+    },
   }
 }
 </script>

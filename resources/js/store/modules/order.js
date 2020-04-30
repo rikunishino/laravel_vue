@@ -1,9 +1,12 @@
 export default {
   state: {
+    // 合計（全学校分）
     total: 0,
+    // 合計（税込み）
     totalIncludedTax: 0,
     classList: [],
-    putProductsList: []
+    putProductsList: [],
+    sPutProductsList: [],
   },
   mutations: {
     setTotal: function(state, total) {
@@ -17,6 +20,9 @@ export default {
     },
     setPutProductsList: function(state, putProductsList) {
       state.putProductsList = putProductsList
-    }
+    },
+    setSPutProductsList: function(state, sPutProductsList) {
+      state.sPutProductsList = sPutProductsList
+    },
   }
 }

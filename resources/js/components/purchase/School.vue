@@ -74,7 +74,7 @@ export default {
       }
     },
     /**
-     * 合計金額の計算
+     * 合計金額（学校単位）の計算
      */
     totalPrice: function(classList) {
       this.total = 0
@@ -89,6 +89,12 @@ export default {
       // 3桁毎にカンマで区切る
       this.totalWithComma = this.addComma(this.total)
       this.totalIncludedTaxWithComma = this.addComma(this.totalIncludedTax)
+
+      this.$emit('totalPrice',
+        {
+          schoolId: this.schoolId,
+          totalPrice: this.total,
+        })
     },
     /**
      * カート削除（全て）
@@ -103,8 +109,7 @@ export default {
      */
     createPutProductsList(putProducts) {
       for(var i = 0; i < this.putProductsList.length; i++) {
-        // console.log(putProducts[0].className + ':' + this.putProductsList[i][0].className);
-        if(putProducts[0].className === this.putProductsList[i][0].className) {
+        if(putProducts.length > 0 && putProducts[0].className === this.putProductsList[i][0].className) {
           this.$set(this.putProductsList, i, putProducts)
           this.$store.commit('setPutProductsList', this.putProductsList)
           return
