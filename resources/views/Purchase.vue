@@ -124,7 +124,7 @@ export default {
      */
     getData: function() {
       // 科目データの取得
-      axios.get('/subject')
+      axios.get('/api/subjects/')
       .then(response => {
         for(var i = 0; i < response.data.length; i++) {
           // デフォルト値の設定
@@ -136,7 +136,7 @@ export default {
       });
 
       // 商品データの取得
-      axios.get('/product')
+      axios.get('/api/products/')
       .then(response => {
         for(var i = 0; i < response.data.length; i++) {
           this.$set(this.products, i, response.data[i])

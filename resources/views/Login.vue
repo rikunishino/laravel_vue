@@ -28,7 +28,7 @@ export default {
   },
   mounted() {
     // console.log('response')
-    axios.get('/corporation')
+    axios.get('/api/corporations/')
       .then(response => {
         this.corporations = response.data
       });
